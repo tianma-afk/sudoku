@@ -9,29 +9,22 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    frame_move.cpp \
+    database.cpp \
+    gamemanager.cpp \
     main.cpp \
-    mainwindow.cpp \
-    page.cpp \
-    page_person.cpp \
-    page_welcome.cpp
+    user.cpp \
+    widget.cpp
 
 HEADERS += \
-    frame_move.h \
-    mainwindow.h \
-    page.h \
-    page_person.h \
-    page_welcome.h
+    database.h \
+    gamemanager.h \
+    user.h \
+    widget.h
 
 FORMS += \
-    mainwindow.ui \
-    page_person.ui \
-    page_welcome.ui
+    widget.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-RESOURCES += \
-    res.qrc
