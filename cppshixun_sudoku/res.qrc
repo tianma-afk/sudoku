@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/aobing.png</file>
+        <file>img/nezha.png</file>
+        <file>img/pic1.png</file>
+        <file>img/pic3.png</file>
+        <file>img/gameboard.png</file>
+        <file>img/checked.png</file>
+        <file>img/closeEye.png</file>
+        <file>img/lastStep.png</file>
+        <file>img/tip.png</file>
+        <file>img/exit.png</file>
+        <file>img/nextStep.png</file>
+        <file>img/openEye.png</file>
+        <file>img/lastStep_disabled.png</file>
+        <file>img/nextStep_disabled.png</file>
+        <file>img/tip_get.png</file>
+        <file>img/help.png</file>
+        <file>img/sudoku.jpeg</file>
+        <file>img/background.png</file>
+        <file>img/background_night.png</file>
+        <file>music/bgm.mp3</file>
+        <file>img/music_pause.png</file>
+        <file>img/music_play.png</file>
+        <file>img/night.png</file>
+        <file>img/day.png</file>
+        <file>gif/link.gif</file>
+        <file>img/link.png</file>
+    </qresource>
+</RCC>
