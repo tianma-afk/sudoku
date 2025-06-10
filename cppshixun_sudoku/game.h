@@ -17,7 +17,6 @@ public:
     void newgame();
     step laststep();
     step nextstep();
-    SDKBoardList save();
     step tip();
     bool check();
     void giveanswer();

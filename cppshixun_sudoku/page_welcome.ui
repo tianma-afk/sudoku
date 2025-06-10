@@ -374,6 +374,45 @@ border-radius:15px;</string>
      <enum>QFrame::Shadow::Raised</enum>
     </property>
    </widget>
+   <widget class="QPushButton" name="btn_link">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>390</y>
+      <width>50</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;网络连接&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">image: url(:/img/link.png);
+border-radius:10px;</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_local">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>140</y>
+      <width>181</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;
+font: 500 36pt &quot;猫啃什锦黑&quot;;
+background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:1, y2:0, stop:0 rgba(106, 170, 184, 255), stop:1 rgba(255, 255, 255, 255));
+</string>
+    </property>
+    <property name="text">
+     <string>单机模式</string>
+    </property>
+   </widget>
    <widget class="frame_move" name="frame_move_right">
     <property name="geometry">
      <rect>
@@ -397,32 +436,13 @@ border-radius:15px;</string>
      <enum>QFrame::Shadow::Raised</enum>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_link">
-    <property name="geometry">
-     <rect>
-      <x>610</x>
-      <y>390</y>
-      <width>50</width>
-      <height>50</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;网络连接&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">image: url(:/img/link.png);
-border-radius:10px;</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <zorder>btn_exit</zorder>
    <zorder>frame_2</zorder>
    <zorder>frame</zorder>
    <zorder>frame_move_left</zorder>
-   <zorder>frame_move_right</zorder>
    <zorder>btn_link</zorder>
+   <zorder>btn_local</zorder>
+   <zorder>frame_move_right</zorder>
   </widget>
  </widget>
  <customwidgets>

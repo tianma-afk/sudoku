@@ -10,6 +10,8 @@ Widget::Widget(QWidget *parent)
     ui->setupUi(this);
     TCP_server = new QTcpServer();
     client_socket=nullptr;
+    this->setLayout(ui->verticalLayout);
+    ui->pte_show->setReadOnly(true);
 }
 
 Widget::~Widget()

@@ -25,6 +25,8 @@ void chat_with_server::read(string msg)
         }else{
             words="结算失败";
         }
+    }else if(jsonData["answerType"]=="checkRank"){
+        words="排名获取成功";
     }
 }
 

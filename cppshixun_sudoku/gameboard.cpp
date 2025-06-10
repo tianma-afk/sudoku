@@ -7,9 +7,11 @@ GameBoard::GameBoard(QWidget *parent)
     , ui(new Ui::GameBoard)
 {
     ui->setupUi(this);
+    ui->comboBox_archive->installEventFilter(this);
     connect(ui->comboBox_archive,&QComboBox::currentIndexChanged,this,&GameBoard::slot_combox_archive_change);
+
     initial_board();
-    QString localpth=QDir::currentPath()+"/help.pdf";
+    QString localpth=QDir::currentPath()+"/help.md";
     helpUrl=QUrl::fromLocalFile(localpth).toString();
 }
 
@@ -28,6 +30,7 @@ void GameBoard::setQTcpSocket(QTcpSocket *server_socket)
 {
     this->server_socket=server_socket;
     if(server_socket!=nullptr){
+        this->isconnection=true;
         connect(server_socket,&QTcpSocket::connected,this,&GameBoard::slot_connected);
         connect(server_socket,&QTcpSocket::readyRead,this,&GameBoard::slot_getData);
         slot_connected();
@@ -73,10 +76,20 @@ void GameBoard::initial_board()
             btn_shuzi=new QPushButton(this->ui->frame_sudoku);
             btn_shuzi->setGeometry(this->ui->frame_sudoku->x()+col_num*61,this->ui->frame_sudoku->y()+row_num*61,60,60);
             btn_shuzi->setVisible(true);
-            btn_shuzi->setStyleSheet(btn_shuzi->styleSheet()+"font: 500 10pt \"猫啃什锦黑\";");
-            if(col_num==row_num||8-col_num==row_num){
-                btn_shuzi->setStyleSheet(btn_shuzi->styleSheet()+"background-color:rgba(255,255,0,180);");
+            btn_shuzi->setStyleSheet(btn_shuzi->styleSheet()+"font: 500 12pt \"猫啃什锦黑\";");
+            if(
+                (col_num<3&&row_num<3)||
+                (col_num<3&&row_num>5)||
+                (col_num>5&&row_num<3)||
+                (col_num>5&&row_num>5)||
+                (col_num>=3&&col_num<=5&&row_num>=3&&row_num<=5)
+                )
+            {
+                btn_shuzi->setStyleSheet(btn_shuzi->styleSheet()+"background-color:rgba(156, 242, 148,180);");
+            }else{
+                btn_shuzi->setStyleSheet(btn_shuzi->styleSheet()+"background-color:rgba(246, 237, 182,180);");
             }
+
             if(col_num==0&&row_num==0){
                 cob.originStyleSheet=btn_shuzi->styleSheet();
             }
@@ -157,6 +170,7 @@ void GameBoard::init_combox_archive()
 
     if(archives.size()!=0){
         ui->comboBox_archive->setCurrentText(archives.at(0).archiveid);
+        this->old_index_of_combox_archive=ui->comboBox_archive->currentIndex();
         game.setGameBoard(archives.at(0).list);
         for(int i=0;i<9;i++){
             for(int j=0;j<9;j++){
@@ -176,27 +190,18 @@ void GameBoard::init_combox_archive()
 
 void GameBoard::on_btn_newgame_clicked()
 {
-    this->comeFrom_func_newGame_or_save=true;
-    if(this->isExistGame){
-        QMessageBox ask_is_save_Box(this);
-        ask_is_save_Box.setText("是否保存当前文件？");
-        ask_is_save_Box.setStandardButtons(QMessageBox::Ok|QMessageBox::Cancel);
-        ask_is_save_Box.setDefaultButton(QMessageBox::Ok);
-        if(ask_is_save_Box.exec()==QMessageBox::Ok){
+    if(this->isExistGame==true){
             oldarc_beforesave.archiveid=ui->comboBox_archive->currentText();
             oldarc_beforesave.list=game.getList();
-            this->saveFromnewGame=true;
+            this->save_from_newGame=true;
+            qDebug()<<"来自新游戏的保存，设置为true";
             on_btn_save_clicked();
-        }else{
-            if(this->isNowGameNew){
-                int index=ui->comboBox_archive->currentIndex();
-                ui->comboBox_archive->removeItem(index);
-                qDebug()<<"删除未保存的新游戏";
-            }
-        }
     }
     //给新文档自动取个名字
+    qDebug()<<"被点击";
     if(this->archives.size()==0){
+        this->index_change_from_newGame=true;
+        qDebug()<<"新游戏改变index，设置为true";
         ui->comboBox_archive->addItem("新存档");
         ui->comboBox_archive->setCurrentText("新存档");
     }else{
@@ -206,6 +211,8 @@ void GameBoard::on_btn_newgame_clicked()
                 break;
             }
             if(i==archives.size()-1){
+                this->index_change_from_newGame=true;
+                qDebug()<<"新游戏改变index，设置为true";
                 ui->comboBox_archive->addItem("新存档");
                 ui->comboBox_archive->setCurrentText("新存档");
                 haveName=true;
@@ -258,7 +265,6 @@ void GameBoard::on_btn_newgame_clicked()
     }
     this->isExistGame=true;
     this->isNowGameNew=true;
-    qDebug()<<"Func:newgame make new";
 }
 
 void GameBoard::on_btn_renew_clicked()
@@ -402,50 +408,110 @@ void GameBoard::on_btn_nextstep_clicked()
 
 void GameBoard::on_btn_save_clicked()
 {
-    if(this->isExistGame==false){
-        QMessageBox::information(this,"注意哦！","还没开始游戏呢！");
-    }else{
-        QString name;
-        if(this->isNowGameNew){
+    if(this->save_from_newGame==true){
+        qDebug()<<"因为创建新游戏，进行保存";
+        QString name=oldarc_beforesave.archiveid;
+        if(this->isNowGameNew==true){
+            qDebug()<<"这是个新游戏，需要起个名字";
             NameDialog dialog(this);
-            dialog.setInputName(ui->comboBox_archive->currentText());
+            dialog.setInputName(name);
             vector<QString>nameList;
-            qDebug()<<"new game:1+"<<this->archives.size();
-            for(const archive&arc:archives){
-                nameList.push_back(arc.archiveid);
-            }
+            for(const archive&arc:archives){nameList.push_back(arc.archiveid);}
             dialog.setNameList(nameList);
             if(dialog.exec()==QDialog::Accepted){
-                int index=ui->comboBox_archive->findText(ui->comboBox_archive->currentText());
+                int index=ui->comboBox_archive->currentIndex();
                 name=dialog.getInputName();
-                if(name!=ui->comboBox_archive->currentText()){
-                    qDebug()<<"名字变了";
-                    this->comeFrom_func_newGame_or_save=true;
-                    ui->comboBox_archive->setItemText(index,name);
-                }else{
-                    qDebug()<<"名字没变";
-                    this->comeFrom_func_newGame_or_save=false;
-                }
+                ui->comboBox_archive->setItemText(index,name);
+                qDebug()<<"将新存档命名为"<<name;
             }
         }else{
-            name=ui->comboBox_archive->currentText();
+            qDebug()<<"这是个老游戏";
         }
-        SDKBoardList list;
-        for(int i=0;i<9;i++){
-            for(int j=0;j<9;j++){
-                list.data[0][i][j]=game.save().data[0][i][j];
+        SDKBoardList list=oldarc_beforesave.list;
+        oldarc_beforesave.archiveid=name;
+        oldarc_beforesave.list=list;
+        if(this->isconnection){
+            QJsonObject jsonData;
+            jsonData["contentType"]="saveArchive";
+            jsonData["username"]=username;
+            jsonData["archiveid"]=name;
+            QString beginBoard;
+            for(int i=0;i<9;i++){for(int j=0;j<9;j++){beginBoard+=QString::number(list.data[0][i][j]);}}
+            QString nowBoard;
+            for(int i=0;i<9;i++){for(int j=0;j<9;j++){nowBoard+=QString::number(list.data[1][i][j]);}}
+            QString answer;
+            for(int i=0;i<9;i++){for(int j=0;j<9;j++){answer+=QString::number(list.data[2][i][j]);}}
+            jsonData["beginBoard"]=beginBoard;
+            jsonData["nowBoard"]=nowBoard;
+            jsonData["answer"]=answer;
+            QString sendMsg=page::jsonToString(jsonData);
+            server_socket->write(sendMsg.toUtf8());
+        }else{
+            QMessageBox::warning(this,"提示","网不好呢");
+        }
+    }else if(this->save_from_arc_change==true){
+        qDebug()<<"因为更换存档，进行保存";
+        QString name=ui->comboBox_archive->itemText(this->old_index_of_combox_archive);
+        if(this->isNowGameNew==true){
+            qDebug()<<"这是个新游戏，需要起个名字";
+            NameDialog dialog(this);
+            dialog.setInputName(name);
+            vector<QString>nameList;
+            for(const archive&arc:archives){nameList.push_back(arc.archiveid);}
+            dialog.setNameList(nameList);
+            if(dialog.exec()==QDialog::Accepted){
+                int index=this->old_index_of_combox_archive;
+                name=dialog.getInputName();
+                ui->comboBox_archive->setItemText(index,name);
+                qDebug()<<"将新存档命名为"<<name;
             }
+        }else{
+            qDebug()<<"这是个老游戏";
         }
-        for(int i=0;i<9;i++){
-            for(int j=0;j<9;j++){
-                list.data[1][i][j]=game.save().data[1][i][j];
+        SDKBoardList list=game.getList();
+        oldarc_beforesave.archiveid=name;
+        oldarc_beforesave.list=list;
+        if(this->isconnection){
+            QJsonObject jsonData;
+            jsonData["contentType"]="saveArchive";
+            jsonData["username"]=username;
+            jsonData["archiveid"]=name;
+            QString beginBoard;
+            for(int i=0;i<9;i++){for(int j=0;j<9;j++){beginBoard+=QString::number(list.data[0][i][j]);}}
+            QString nowBoard;
+            for(int i=0;i<9;i++){for(int j=0;j<9;j++){nowBoard+=QString::number(list.data[1][i][j]);}}
+            QString answer;
+            for(int i=0;i<9;i++){for(int j=0;j<9;j++){answer+=QString::number(list.data[2][i][j]);}}
+            jsonData["beginBoard"]=beginBoard;
+            jsonData["nowBoard"]=nowBoard;
+            jsonData["answer"]=answer;
+            QString sendMsg=page::jsonToString(jsonData);
+            server_socket->write(sendMsg.toUtf8());
+        }else{
+            QMessageBox::warning(this,"提示","网不好呢");
+        }
+    }else{
+        qDebug()<<"因为点击保存按钮，进行保存";
+        QString name=ui->comboBox_archive->currentText();
+        if(this->isNowGameNew==true){
+            qDebug()<<"这是个新游戏，需要起个名字";
+            NameDialog dialog(this);
+            dialog.setInputName(name);
+            vector<QString>nameList;
+            for(const archive&arc:archives){nameList.push_back(arc.archiveid);}
+            dialog.setNameList(nameList);
+            if(dialog.exec()==QDialog::Accepted){
+                int index=ui->comboBox_archive->currentIndex();
+                name=dialog.getInputName();
+                ui->comboBox_archive->setItemText(index,name);
+                qDebug()<<"将新存档命名为"<<name;
             }
+        }else{
+            qDebug()<<"这是个老游戏";
         }
-        for(int i=0;i<9;i++){
-            for(int j=0;j<9;j++){
-                list.data[2][i][j]=game.save().data[2][i][j];
-            }
-        }
+        SDKBoardList list=game.getList();
+        oldarc_beforesave.archiveid=name;
+        oldarc_beforesave.list=list;
         if(this->isconnection){
             QJsonObject jsonData;
             jsonData["contentType"]="saveArchive";
@@ -470,8 +536,9 @@ void GameBoard::on_btn_save_clicked()
 
 void GameBoard::on_btn_exit_clicked()
 {
-    //on_btn_save_clicked();
-    QApplication::quit();
+    disconnect(server_socket,&QTcpSocket::readyRead,this,&GameBoard::slot_getData);
+    this->isconnection=false;
+    emit GameBoard::signal_switch_board_to_person();
 }
 
 void GameBoard::on_btn_help_clicked()
@@ -502,23 +569,50 @@ void GameBoard::slot_getData()
     QString answer=chat->getAnswer();
     if(answer=="保存成功"){
         QMessageBox::information(this,"保存成功","保存成功");
-        if(this->isNowGameNew==true){
-            if(this->saveFromnewGame){
-                archives.push_back(oldarc_beforesave);
-                this->saveFromnewGame=false;
-            }else{
-                archive arc;
-                arc.archiveid=ui->comboBox_archive->currentText();
-                arc.list=game.getList();
-                archives.push_back(arc);
-                this->isNowGameNew=false;
-                qDebug()<<"Func:data_after_save make old";
+        if(this->save_from_newGame==true){
+            qDebug()<<"服务端因为新游戏的保存成功";
+            this->save_from_newGame=false;
+            qDebug()<<"创建新新游戏成功，oldindex改变";
+            this->old_index_of_combox_archive=ui->comboBox_archive->currentIndex();
+            for(size_t t=0;t<archives.size();t++){
+                if(archives.at(t).archiveid==oldarc_beforesave.archiveid){
+                    archives.at(t).list=oldarc_beforesave.list;
+                    qDebug()<<"这是老游戏";
+                    break;
+                }
+                if(t==archives.size()-1){
+                    archives.push_back(oldarc_beforesave);
+                    qDebug()<<"这是新游戏";
+                }
+            }
+        }else if(this->save_from_arc_change==true){
+            qDebug()<<"服务端因为更换存档的保存成功";
+            this->save_from_arc_change=false;
+            for(size_t t=0;t<archives.size();t++){
+                if(archives.at(t).archiveid==oldarc_beforesave.archiveid){
+                    archives.at(t).list=oldarc_beforesave.list;
+                    qDebug()<<"这是老游戏";
+                    break;
+                }
+                if(t==archives.size()-1){
+                    archives.push_back(oldarc_beforesave);
+                    qDebug()<<"这是新游戏";
+                }
             }
         }else{
-            for(size_t i=0;i<this->archives.size();i++){
-                if(this->archives.at(i).archiveid==ui->comboBox_archive->currentText()){
-                    this->archives.at(i).list=game.getList();
-                    break;
+            qDebug()<<"服务端因为点击保存按钮的保存成功";
+            if(this->isNowGameNew==true){
+                this->isNowGameNew=false;
+                qDebug()<<"这是新游戏";
+                qDebug()<<"点击保存使得新游戏变旧";
+                archives.push_back(oldarc_beforesave);
+            }else{
+                qDebug()<<"这是老游戏";
+                for(size_t t=0;t<archives.size();t++){
+                    if(archives.at(t).archiveid==oldarc_beforesave.archiveid){
+                        archives.at(t).list=oldarc_beforesave.list;
+                        break;
+                    }
                 }
             }
         }
@@ -544,16 +638,16 @@ void GameBoard::slot_getData()
 
 void GameBoard::slot_combox_archive_change()
 {
-    qDebug()<<"被调用";
-    qDebug()<<this->comeFrom_func_newGame_or_save;
-    if(comeFrom_func_newGame_or_save){
-        qDebug()<<"来自新游戏或者保存的换字";
-        comeFrom_func_newGame_or_save=false;
+    if(this->index_change_from_newGame==true){
+        qDebug()<<"因为创建新游戏，改变了index";
+        this->index_change_from_newGame=false;
     }else{
+        qDebug()<<"因为更换存档，改变了index";
+        this->save_from_arc_change=true;
         on_btn_save_clicked();
-        for(size_t i=0;i<archives.size();i++){
-            if(archives.at(i).archiveid==ui->comboBox_archive->currentText()){
-                game.setGameBoard(archives.at(i).list);
+        for(size_t t=0;t<archives.size();t++){
+            if(archives.at(t).archiveid==ui->comboBox_archive->currentText()){
+                game.setGameBoard(archives.at(t).list);
                 for(int i=0;i<9;i++){
                     for(int j=0;j<9;j++){
                         int value=game.getValue(i,j);
@@ -570,4 +664,13 @@ void GameBoard::slot_combox_archive_change()
             }
         }
     }
+    this->old_index_of_combox_archive=ui->comboBox_archive->currentIndex();
 }
+
+void GameBoard::slot_disconnect()
+{
+    qDebug()<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    this->isconnection=false;
+}
+
+

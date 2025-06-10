@@ -2,7 +2,6 @@
 #define PAGE_WELCOME_H
 #include"frame_move.h"
 #include <QWidget>
-#include<QTcpSocket>
 #include"page.h"
 #include"chat_with_server.h"
 namespace Ui {
@@ -18,8 +17,11 @@ public:
     explicit page_welcome(page*parent = nullptr);
     ~page_welcome();
     QString getUsername();
-    void setQTcpSocket(QTcpSocket*server_socket);
     void setChat_with_server(chat_with_server*chat);
+    void setQTcpSocket(QTcpSocket*server_socket);
+public:
+signals:
+    void play_local();
 private:
     Ui::page_welcome *ui;
 private slots:
@@ -27,14 +29,16 @@ private slots:
     void on_frame_move_right_hovered();
     void on_btn_register_clicked();
     void on_btn_login_clicked();
-    void slot_getData();
-    void slot_connected();
+    void on_btn_local_clicked();
+
     void on_btn_seePassword_clicked();
     void on_btn_link_clicked();
+    void slot_getData();
+    void slot_connected();
 private:
-
     chat_with_server* chat;
-    QTcpSocket*server_socket;
+QTcpSocket*server_socket;
+
     QString username;
 };
 

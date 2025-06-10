@@ -48,26 +48,6 @@ void Game::record(const int x, const int y, const int value,const bool go)
         list.data[1][x][y]=0;
 }
 
-SDKBoardList Game::save()
-{
-    SDKBoardList list;
-    for(int i=0;i<9;i++){
-        for(int j=0;j<9;j++){
-            list.data[0][i][j]=this->list.data[0][i][j];
-        }
-    }
-    for(int i=0;i<9;i++){
-        for(int j=0;j<9;j++){
-            list.data[1][i][j]=this->list.data[1][i][j];
-        }
-    }
-    for(int i=0;i<9;i++){
-        for(int j=0;j<9;j++){
-            list.data[2][i][j]=this->list.data[2][i][j];
-        }
-    }
-    return list;
-}
 
 step Game::tip()
 {

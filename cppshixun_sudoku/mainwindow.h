@@ -25,7 +25,8 @@ public:
 private:
     page_welcome*obj_page_welcome;
     page_person*obj_page_person;
-    QWidget*game_board;
+    QWidget*game_board=0;
+    QWidget*game_board_2=0;
     Ui::MainWindow *ui;
     QStackedWidget*stack;
     QString username;
@@ -38,12 +39,15 @@ private:
     bool isDarkMode=false;
     void firstPlay();
 private slots:
-    void slot_switch_page(const int id);
+    void slot_switch_page_to_gameBoard_2();
+    void slot_switch_page_to_gameBorad();
+    void slot_switch_page_to_person();
     void slot_disconnect();
     void on_btn_music_clicked();
     void on_btn_style_clicked();
     void on_btn_link_clicked();
-
+    void slot_play_local();
+    void slot_switch_board_to_welcome();
 
 private://一些样式和文件
     const QString lightStyle=R"(QWidget#backgroundWidget{
@@ -51,7 +55,7 @@ private://一些样式和文件
                                 background-repeat:no-repeat;
                                 background-position: center;})";
     const QString darkStyle=R"( QPushButton{
-                                    background-color:#4a4a4a;}
+                                    background-color:#FFFFFF;}
                                 QWidget#backgroundWidget{
                                     background-image: url(:/img/background_night.png);
                                     background-repeat:no-repeat;

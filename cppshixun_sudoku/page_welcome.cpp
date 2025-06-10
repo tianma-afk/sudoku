@@ -160,6 +160,11 @@ void page_welcome::on_btn_login_clicked()
     }
 }
 
+void page_welcome::on_btn_local_clicked()
+{
+    emit play_local();
+}
+
 void page_welcome::slot_connected(){
     this->isconnection=true;
 }
@@ -236,7 +241,7 @@ void page_welcome::slot_getData(){
     chat->read(getMsg.toStdString());
     if(chat->getAnswer()=="登录或注册成功"){
         disconnect(server_socket,&QTcpSocket::readyRead,this,&page_welcome::slot_getData);
-        emit signal_switch_page(2);
+        emit signal_switch_page_to_person();
     }else if(chat->getAnswer()=="登录或注册失败"){
         QMessageBox::warning(this,"有问题哦！",chat->jsonData["reason"].toString());
         if(chat->jsonData["reason"].toString()=="用户名已存在"){

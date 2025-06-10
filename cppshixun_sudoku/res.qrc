@@ -26,5 +26,7 @@
         <file>img/day.png</file>
         <file>gif/link.gif</file>
         <file>img/link.png</file>
+        <file>img/rankOut.png</file>
+        <file>img/bk.jpg</file>
     </qresource>
 </RCC>

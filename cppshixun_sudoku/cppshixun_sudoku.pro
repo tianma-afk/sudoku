@@ -12,29 +12,36 @@ SOURCES += \
     chat_with_server.cpp \
     frame_move.cpp \
     game.cpp \
+    game_2.cpp \
     gameboard.cpp \
+    gameboard_2.cpp \
     main.cpp \
     mainwindow.cpp \
     namedialog.cpp \
     page.cpp \
     page_person.cpp \
     page_welcome.cpp \
+    rankitem.cpp \
     sdkboardlist.cpp
 
 HEADERS += \
     chat_with_server.h \
     frame_move.h \
     game.h \
+    game_2.h \
     gameboard.h \
+    gameboard_2.h \
     mainwindow.h \
     namedialog.h \
     page.h \
     page_person.h \
     page_welcome.h \
+    rankitem.h \
     sdkboardlist.h
 
 FORMS += \
     gameboard.ui \
+    gameboard_2.ui \
     mainwindow.ui \
     namedialog.ui \
     page_person.ui \

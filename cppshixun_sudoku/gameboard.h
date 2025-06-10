@@ -32,22 +32,30 @@ class GameBoard : public QWidget
     Q_OBJECT
 
 public:
+    bool isconnection=false;
     explicit GameBoard(QWidget *parent = nullptr);
     ~GameBoard();
     void setUsername(QString username);
     void setQTcpSocket(QTcpSocket*server_socket);
     void setChat_with_server(chat_with_server*chat);
+signals:
+    void signal_switch_board_to_person();
 private:
-    bool comeFrom_func_newGame_or_save;
-    bool saveFromnewGame=false;
-    archive oldarc_beforesave;
+    //改变index
+    bool index_change_from_newGame;//combox_archive的index改变原因是否在于新游戏创建
+    //save的原因
+    bool save_from_newGame=false;//这个保存是否原因在于新游戏未保存直接开始又一个新游戏
+    bool save_from_arc_change=false;//这个保存是否原因在于更换存档
 
+    bool isExistGame=false;//当前游戏板上是否存在游戏
+    bool isNowGameNew=false;//当前游戏板上的游戏是否是新的
+
+    archive oldarc_beforesave;
     checkOneBtn cob={false,0,0,""};
     void makeCheckOneBtn(const int x,const int y);
     void defaultCheckOneBtn();
     int old_index_of_combox_archive=0;
-    bool isExistGame=false;
-    bool isNowGameNew=false;
+
     QString username;
     void initial_board();
     void clear_board();
@@ -57,7 +65,6 @@ private:
     Ui::GameBoard *ui;
     Game game;
     QString helpUrl;
-    bool isconnection;
     chat_with_server*chat;
     QTcpSocket*server_socket;
     vector<archive>archives;
@@ -75,6 +82,7 @@ private slots:
     void slot_connected();
     void slot_getData();
     void slot_combox_archive_change();
+    void slot_disconnect();
 };
 
 #endif // GAMEBOARD_H

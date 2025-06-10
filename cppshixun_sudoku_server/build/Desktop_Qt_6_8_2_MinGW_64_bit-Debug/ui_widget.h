@@ -14,6 +14,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -21,8 +22,9 @@ QT_BEGIN_NAMESPACE
 class Ui_Widget
 {
 public:
+    QWidget *widget;
+    QVBoxLayout *verticalLayout;
     QPlainTextEdit *pte_show;
-    QWidget *layoutWidget;
     QHBoxLayout *horizontalLayout;
     QPushButton *btn_start;
     QPushButton *btn_stop;
@@ -32,24 +34,32 @@ public:
         if (Widget->objectName().isEmpty())
             Widget->setObjectName("Widget");
         Widget->resize(690, 447);
-        pte_show = new QPlainTextEdit(Widget);
+        widget = new QWidget(Widget);
+        widget->setObjectName("widget");
+        widget->setGeometry(QRect(-3, -10, 701, 451));
+        verticalLayout = new QVBoxLayout(widget);
+        verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setContentsMargins(0, 0, 0, 0);
+        pte_show = new QPlainTextEdit(widget);
         pte_show->setObjectName("pte_show");
-        pte_show->setGeometry(QRect(0, -10, 691, 351));
-        layoutWidget = new QWidget(Widget);
-        layoutWidget->setObjectName("layoutWidget");
-        layoutWidget->setGeometry(QRect(-3, 339, 701, 111));
-        horizontalLayout = new QHBoxLayout(layoutWidget);
+        pte_show->setStyleSheet(QString::fromUtf8("font: 14pt \"Consolas\";"));
+
+        verticalLayout->addWidget(pte_show);
+
+        horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
-        btn_start = new QPushButton(layoutWidget);
+        btn_start = new QPushButton(widget);
         btn_start->setObjectName("btn_start");
 
         horizontalLayout->addWidget(btn_start);
 
-        btn_stop = new QPushButton(layoutWidget);
+        btn_stop = new QPushButton(widget);
         btn_stop->setObjectName("btn_stop");
 
         horizontalLayout->addWidget(btn_stop);
+
+
+        verticalLayout->addLayout(horizontalLayout);
 
 
         retranslateUi(Widget);

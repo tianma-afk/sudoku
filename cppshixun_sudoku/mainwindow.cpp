@@ -3,6 +3,7 @@
 #include "ui_mainwindow.h"
 #include<QDebug>
 #include"gameboard.h"
+#include"gameboard_2.h"
 #include<QVBoxLayout>
 #include<QPainter>
 #include<QMovie>
@@ -41,7 +42,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->BKVlayout->addWidget(stack);
     stack->addWidget(obj_page_welcome);
     stack->addWidget(obj_page_person);
-    connect(obj_page_welcome,&page_welcome::signal_switch_page,this,&MainWindow::slot_switch_page);
+    connect(obj_page_welcome,&page_welcome::signal_switch_page_to_person,this,&MainWindow::slot_switch_page_to_person);
+    connect(obj_page_person,&page_person::signal_switch_page_to_GameBoard,this,&MainWindow::slot_switch_page_to_gameBorad);
+    connect(obj_page_person,&page_person::signal_switch_page_to_GameBoard_2,this,&MainWindow::slot_switch_page_to_gameBoard_2);
+    connect(obj_page_welcome,&page_welcome::play_local,this,&MainWindow::slot_play_local);
 }
 
 MainWindow::~MainWindow()
@@ -73,21 +77,34 @@ void MainWindow::changeSettingVisible(const bool isVisible)
     }
 }
 
-void MainWindow::slot_switch_page(const int id)
+void MainWindow::slot_switch_page_to_gameBorad()
 {
-    game_board=new GameBoard();
+    if(game_board==nullptr){
+        game_board=new GameBoard();
+    }
     this->username=obj_page_welcome->getUsername();
     ((GameBoard*)game_board)->setUsername(username);
-
 
     ((GameBoard*)game_board)->setQTcpSocket(this->server_socket);
     ((GameBoard*)game_board)->setChat_with_server(this->chat);
 
     game_board->setAttribute(Qt::WA_TranslucentBackground);
-    stack->addWidget(game_board);
-    stack->setCurrentIndex(id);
+    if(stack->count()<3){
+        stack->addWidget(game_board);
+    }
+    stack->setCurrentIndex(2);
+    connect((GameBoard*)game_board,&GameBoard::signal_switch_board_to_person,this,&MainWindow::slot_switch_page_to_person);
+}
 
-    // 调用基类实现处理其他绘制
+void MainWindow::slot_switch_page_to_person()
+{
+    this->username=obj_page_welcome->getUsername();
+    obj_page_person->setUsername(this->username);
+    obj_page_person->setQTcpSocket(this->server_socket);
+    obj_page_person->setChat_with_server(this->chat);
+
+    stack->setCurrentIndex(1);
+
     this->setStyleSheet("QWidget#backgroundWidget{"
                         "background-image: url(:/img/background.png);"
                         "background-repeat:no-repeat;"
@@ -108,6 +125,23 @@ void MainWindow::firstPlay(){
     this->mediaPlayer->setSource(Url_BGM);
     this->mediaPlayer->setLoops(QMediaPlayer::Infinite);
     this->mediaPlayer->play();
+}
+
+void MainWindow::slot_switch_page_to_gameBoard_2()
+{
+    if(stack->count()<3){
+        if(game_board==nullptr){
+            game_board=new GameBoard();
+        }
+        stack->addWidget(game_board);
+    }
+    if(game_board_2==nullptr){
+        game_board_2=new GameBoard_2();    
+        stack->addWidget(game_board_2);
+    }
+    ((GameBoard_2*)game_board_2)->set_is_local(false);
+    stack->setCurrentIndex(3);
+    connect((GameBoard_2*)game_board_2,&GameBoard_2::signal_switch_board_to_person,this,&MainWindow::slot_switch_page_to_person);
 }
 
 void MainWindow::slot_disconnect()
@@ -178,6 +212,38 @@ void MainWindow::on_btn_link_clicked()
             have_try=true;
         }
     }
+}
+
+void MainWindow::slot_play_local()
+{
+    this->setStyleSheet("QWidget#backgroundWidget{"
+                        "background-image: url(:/img/background.png);"
+                        "background-repeat:no-repeat;"
+                        "background-position: center;"
+                        "}");
+    this->setWindowFlag(Qt::FramelessWindowHint,false);
+    this->setAttribute(Qt::WA_TranslucentBackground,false);
+    changeSettingVisible(true);
+    this->showMaximized();
+    if(game_board_2==nullptr){
+        game_board_2=new GameBoard_2();
+        stack->addWidget(game_board_2);
+    }
+    ((GameBoard_2*)game_board_2)->set_is_local(true);
+    stack->setCurrentIndex(2);
+    connect((GameBoard_2*)game_board_2,&GameBoard_2::signal_switch_board_to_welcome,this,&MainWindow::slot_switch_board_to_welcome);
+}
+
+void MainWindow::slot_switch_board_to_welcome()
+{
+    this->setWindowFlag(Qt::FramelessWindowHint);
+    this->setAttribute(Qt::WA_TranslucentBackground);
+    changeSettingVisible(false);
+    this->showMaximized();
+    stack->setCurrentIndex(0);
+    stack->removeWidget(game_board_2);
+    delete (GameBoard_2*)game_board_2;
+    game_board_2=nullptr;
 }
 
 
