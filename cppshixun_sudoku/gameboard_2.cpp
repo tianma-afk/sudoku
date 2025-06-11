@@ -83,9 +83,7 @@ void GameBoard_2::initial_board()
                 }else{
                     if(game.isValid(row-1,col-1,value)){
                         btn_shuzi_vec.at(row-1).at(col-1)->setText(QString::number(value));
-                        game.record(row-1,col-1,value);
-
-                        ui->label_loc->setText("未选中");
+                        game.record(row-1,col-1,value);ui->label_loc->setText("未选中");
                     }else{
                         ui->label_loc->setText("重复了");
                     }

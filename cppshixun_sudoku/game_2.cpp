@@ -28,20 +28,20 @@ bool Game_2::isValid(const int x, const int y, const int value) const
 {
     //该行是否重复
     for(int i=0;i<9;i++){
-        if(board[2].data[x][i][0]==value){
+        if(board[1].data[x][i][0]==value){
             return false;
         }
     }
     //该列是否重复
     for(int i=0;i<9;i++){
-        if(board[2].data[i][y][0]==value){
+        if(board[1].data[i][y][0]==value){
             return false;
         }
     }
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            if(board[2].data[i][j][1]==board[2].data[x][y][1]){
-                if(board[2].data[i][j][0]==value){
+            if(board[1].data[i][j][1]==board[1].data[x][y][1]){
+                if(board[1].data[i][j][0]==value){
                     return false;
                 }
             }
@@ -62,7 +62,7 @@ bool Game_2::check()
 {
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            if(!isValid(i,j,board[2].data[i][j][0])){
+            if(!isValid(i,j,board[1].data[i][j][0])){
                 return false;
             }
         }
@@ -102,11 +102,11 @@ bool Game_2::make(const int row,const int col)
     //判断继续填充是否可行的巧妙之处在于，如果下次填充能够获得完整数独就认为本次是可行的，如果下次填充不能获得完整数独则本次也不行。
     for (int num : arr) {
         if (isValid(row, col, num)) {
-            this->board[2].data[row][col][0] = num;
+            this->board[1].data[row][col][0] = num;
             if (make(row,col+1)){//判断下次填充是否可得完整数独板
                 return true;
             }
-            this->board[2].data[row][col][0] = 0;//如果不可，就退回0，再换下一个数字。
+            this->board[1].data[row][col][0] = 0;//如果不可，就退回0，再换下一个数字。
         }
     }
     return false;
@@ -117,30 +117,30 @@ void Game_2::makeGong()
     //先形成标准宫
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            board[2].data[i][j][0]=0;
+            board[1].data[i][j][0]=0;
             if(i>=0&&i<=2){
                 if(j>=0&&j<=2){
-                    board[2].data[i][j][1]=0;
+                    board[1].data[i][j][1]=0;
                 }else if(j>=3&&j<=5){
-                    board[2].data[i][j][1]=1;
+                    board[1].data[i][j][1]=1;
                 }else{
-                    board[2].data[i][j][1]=2;
+                    board[1].data[i][j][1]=2;
                 }
             }else if(i>=3&&i<=5){
                 if(j>=0&&j<=2){
-                    board[2].data[i][j][1]=3;
+                    board[1].data[i][j][1]=3;
                 }else if(j>=3&&j<=5){
-                    board[2].data[i][j][1]=4;
+                    board[1].data[i][j][1]=4;
                 }else{
-                    board[2].data[i][j][1]=5;
+                    board[1].data[i][j][1]=5;
                 }
             }else{
                 if(j>=0&&j<=2){
-                    board[2].data[i][j][1]=6;
+                    board[1].data[i][j][1]=6;
                 }else if(j>=3&&j<=5){
-                    board[2].data[i][j][1]=7;
+                    board[1].data[i][j][1]=7;
                 }else{
-                    board[2].data[i][j][1]=8;
+                    board[1].data[i][j][1]=8;
                 }
             }
         }
@@ -176,7 +176,7 @@ vector<dot> Game_2::get_bian_jie(const int gong)
     vector<dot>bian_jie;
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            if(board[2].data[i][j][1]==gong){
+            if(board[1].data[i][j][1]==gong){
                 dot tmp;tmp.x=i;tmp.y=j;
                 all.push_back(tmp);
             }
@@ -185,19 +185,19 @@ vector<dot> Game_2::get_bian_jie(const int gong)
     for(int i=0;i<9;i++){
         dot d=all.at(i);
         //上
-        if(d.x-1!=-1&&board[2].data[d.x-1][d.y][1]!=gong){
+        if(d.x-1!=-1&&board[1].data[d.x-1][d.y][1]!=gong){
             bian_jie.push_back(d);
         }
         //下
-        else if(d.x+1!=9&&board[2].data[d.x+1][d.y][1]!=gong){
+        else if(d.x+1!=9&&board[1].data[d.x+1][d.y][1]!=gong){
             bian_jie.push_back(d);
         }
         //左
-        else if(d.y-1!=-1&&board[2].data[d.x][d.y-1][1]!=gong){
+        else if(d.y-1!=-1&&board[1].data[d.x][d.y-1][1]!=gong){
             bian_jie.push_back(d);
         }
         //右
-        else if(d.y+1!=9&&board[2].data[d.x][d.y+1][1]!=gong){
+        else if(d.y+1!=9&&board[1].data[d.x][d.y+1][1]!=gong){
             bian_jie.push_back(d);
         }
     }
@@ -210,7 +210,7 @@ vector<dot> Game_2::get_other_bian_jie(const int gong)
     vector<dot>bian_jie;
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            if(board[2].data[i][j][1]==gong){
+            if(board[1].data[i][j][1]==gong){
                 dot tmp;tmp.x=i;tmp.y=j;
                 all.push_back(tmp);
             }
@@ -219,28 +219,28 @@ vector<dot> Game_2::get_other_bian_jie(const int gong)
     for(int i=0;i<9;i++){
         dot d=all.at(i);
         //上
-        if(d.x-1!=-1&&board[2].data[d.x-1][d.y][1]!=gong){
+        if(d.x-1!=-1&&board[1].data[d.x-1][d.y][1]!=gong){
             dot tmp;tmp.x=d.x-1;tmp.y=d.y;
             if(!is_vector_have(bian_jie,tmp)){
                 bian_jie.push_back(tmp);
             }
         }
         //下
-        if(d.x+1!=9&&board[2].data[d.x+1][d.y][1]!=gong){
+        if(d.x+1!=9&&board[1].data[d.x+1][d.y][1]!=gong){
             dot tmp;tmp.x=d.x+1;tmp.y=d.y;
             if(!is_vector_have(bian_jie,tmp)){
                 bian_jie.push_back(tmp);
             }
         }
         //左
-        if(d.y-1!=-1&&board[2].data[d.x][d.y-1][1]!=gong){
+        if(d.y-1!=-1&&board[1].data[d.x][d.y-1][1]!=gong){
             dot tmp;tmp.x=d.x;tmp.y=d.y-1;
             if(!is_vector_have(bian_jie,tmp)){
                 bian_jie.push_back(tmp);
             }
         }
         //右
-        if(d.y+1!=9&&board[2].data[d.x][d.y+1][1]!=gong){
+        if(d.y+1!=9&&board[1].data[d.x][d.y+1][1]!=gong){
             dot tmp;tmp.x=d.x;tmp.y=d.y+1;
             if(!is_vector_have(bian_jie,tmp)){
                 bian_jie.push_back(tmp);
@@ -257,10 +257,10 @@ void Game_2::make_hole()
 {
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            this->board[0].data[i][j][0]=this->board[2].data[i][j][0];
-            this->board[1].data[i][j][0]=this->board[2].data[i][j][0];
-            this->board[0].data[i][j][1]=this->board[2].data[i][j][1];
-            this->board[1].data[i][j][1]=this->board[2].data[i][j][1];
+            this->board[0].data[i][j][0]=this->board[1].data[i][j][0];
+            this->board[2].data[i][j][0]=this->board[1].data[i][j][0];
+            this->board[0].data[i][j][1]=this->board[1].data[i][j][1];
+            this->board[2].data[i][j][1]=this->board[1].data[i][j][1];
         }
     }
     int empty=30;
@@ -284,14 +284,14 @@ bool Game_2::swap_bianjie(const dot d,const int gong)
     vector<dot>other_bian_jie=get_other_bian_jie(gong);
     for(size_t i=0;i<other_bian_jie.size();i++){
         dot other=other_bian_jie.at(i);
-        int o_value=board[2].data[other.x][other.y][1];
-        board[2].data[d.x][d.y][1]=o_value;
-        board[2].data[other.x][other.y][1]=gong;
+        int o_value=board[1].data[other.x][other.y][1];
+        board[1].data[d.x][d.y][1]=o_value;
+        board[1].data[other.x][other.y][1]=gong;
         if(isConnect(o_value)&&isConnect(gong)){
             return true;
         }else{
-            board[2].data[d.x][d.y][1]=gong;
-            board[2].data[other.x][other.y][1]=o_value;
+            board[1].data[d.x][d.y][1]=gong;
+            board[1].data[other.x][other.y][1]=o_value;
         }
     }
     return false;
@@ -303,7 +303,7 @@ bool Game_2::isConnect(const int gong)
     dot begin;
     for(int i=0;i<9;i++){
         for(int j=0;j<9;j++){
-            if(board[2].data[i][j][1]==gong){
+            if(board[1].data[i][j][1]==gong){
                 begin.x=i;begin.y=j;
                 find=true;
                 break;
@@ -328,7 +328,7 @@ bool Game_2::isConnect(const int gong)
 void Game_2::find_around(const dot d,const int gong)
 {
     //上
-    if(d.x-1!=-1&&board[2].data[d.x-1][d.y][1]==gong){
+    if(d.x-1!=-1&&board[1].data[d.x-1][d.y][1]==gong){
         dot tmp;tmp.x=d.x-1;tmp.y=d.y;
         if(!is_vector_have(vec_find_around,tmp)){
             vec_find_around.push_back(tmp);
@@ -336,7 +336,7 @@ void Game_2::find_around(const dot d,const int gong)
         }
     }
     //下
-    if(d.x+1!=9&&board[2].data[d.x+1][d.y][1]==gong){
+    if(d.x+1!=9&&board[1].data[d.x+1][d.y][1]==gong){
         dot tmp;tmp.x=d.x+1;tmp.y=d.y;
         if(!is_vector_have(vec_find_around,tmp)){
             vec_find_around.push_back(tmp);
@@ -344,7 +344,7 @@ void Game_2::find_around(const dot d,const int gong)
         }
     }
     //左
-    if(d.y-1!=-1&&board[2].data[d.x][d.y-1][1]==gong){
+    if(d.y-1!=-1&&board[1].data[d.x][d.y-1][1]==gong){
         dot tmp;tmp.x=d.x;tmp.y=d.y-1;
         if(!is_vector_have(vec_find_around,tmp)){
             vec_find_around.push_back(tmp);
@@ -352,7 +352,7 @@ void Game_2::find_around(const dot d,const int gong)
         }
     }
     //右
-    if(d.y+1!=9&&board[2].data[d.x][d.y+1][1]==gong){
+    if(d.y+1!=9&&board[1].data[d.x][d.y+1][1]==gong){
         dot tmp;tmp.x=d.x;tmp.y=d.y+1;
         if(!is_vector_have(vec_find_around,tmp)){
             vec_find_around.push_back(tmp);
@@ -366,7 +366,7 @@ void Game_2::game_debug()
     for(int i=0;i<9;i++){
         QString str;
         for(int j=0;j<9;j++){
-            str+=QString::number(board[2].data[i][j][1])+" ";
+            str+=QString::number(board[1].data[i][j][1])+" ";
         }
         //qDebug()<<str;
     }
